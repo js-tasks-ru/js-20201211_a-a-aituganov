@@ -10,10 +10,6 @@ export function sortStrings(arr, param = 'asc') {
      caseFirst: "upper"
    });
     
-   if (param === "asc") {
-     return newArr.sort((a, b) => collator.compare(a, b));
-   }
-   else if (param === "desc") {
-     return newArr.sort((a, b) => collator.compare(b, a));;
-   }
+   (param === "asc") ? newArr.sort((a, b) => collator.compare(a, b)) :
+   (param === "desc") ? newArr.sort((a, b) => collator.compare(b, a))
 }
