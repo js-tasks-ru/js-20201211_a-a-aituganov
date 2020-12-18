@@ -6,12 +6,10 @@
  */
 export function sortStrings(arr, param = 'asc') {
 
-    let newArr = arr.slice();
+    let newArr = arr.slice().sort((a, b) => a.localeCompare(b, 'ru-en', {caseFirst: "upper"}));
     
-    if (param === "asc") {
-        return newArr.sort((a, b) => a.localeCompare(b, 'ru-en', {caseFirst: "upper"}));
-    }
-    else if (param === "desc") {
-        return newArr.sort((a, b) => b.localeCompare(a, 'ru-en', {caseFirst: "upper"}));
-    }
+    if (param === 'asc') {
+        return newArr;
+    } else if (param === 'desc') return newArr.reverse();
+
 }
