@@ -6,4 +6,14 @@
  */
 export const pick = (obj, ...fields) => {
 
+    const filtered = Object.entries(obj).filter(el => fields.includes(el[0]));
+  
+    let newObj = {};
+  
+    for (let i of filtered) {
+        newObj[i[0]] = i[1];
+    }
+  
+    return newObj;
+    
 };
