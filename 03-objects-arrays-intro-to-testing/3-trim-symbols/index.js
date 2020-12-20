@@ -8,16 +8,18 @@ export function trimSymbols(string, size) {
     if (typeof size === 'undefined') return string;
     if (string.length === 0 || size === 0) return '';
     
-    let result = '', 
+    let result = '',
         prevLetter = '',
         count = 0;
-    const letters = Array.from(string);
+    const letters = Array.from(string); // превращаем строку в массив
 
-    for (let i = 0; i < letters.length; i++) {
+    for (let i = 0; i < letters.length; i++) { 
         if (prevLetter !== letters[i] || count < size) {
-        result += letters[i];
+            result += letters[i]; // здесь ставится условие чтобы в результат не попала лишняя буква 
         }
+
         if (count === size) count = 0;
+
         count++;
         prevLetter = letters[i];
     }
