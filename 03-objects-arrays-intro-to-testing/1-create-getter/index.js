@@ -5,4 +5,18 @@
  */
 export function createGetter(path) {
 
+  const pathToArr = path.split('.');
+  
+  return function (obj) {
+    if (Object.entries(obj).length > 0) {
+
+      let keys = obj[pathToArr[0]];
+  
+      for (let i = 1; i < pathToArr.length; i++) {
+        keys = keys[pathToArr[i]];
+      }
+  
+      return keys;
+    }
+  }
 }
