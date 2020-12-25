@@ -33,7 +33,6 @@ export default class ColumnChart {
         }
       }
       
-      
       this.element = element.firstElementChild;
     }
 
