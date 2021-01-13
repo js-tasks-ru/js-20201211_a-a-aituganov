@@ -1,35 +1,36 @@
 import fetchJson from "./utils/fetch-json";
 
 export default class ColumnChart {
-  chartHeight = 50
+  element;
+  chartHeight = 50;
+  subElements = {};
 
-  dataFromServer = [];
-
-  constructor({ 
-  url = '', 
-  range = { 
-    from: new Date(''), 
-    to: new Date('') 
-  }, 
-  label = '', 
-  link = "#",
-  formatHeading = data => data} = {}) 
-  {
-      this.url = url;
-      this.from = range.from;
-      this.to = range.to;
-      this.label = label;
-      this.link = link;
-      this.formatHeading = formatHeading;
-
-      this.render();
-      this.requestData();
+  constructor({
+    label = '',
+    link = '',
+    formatHeading = data => data,
+    url = '',
+    range = {
+      from: new Date(),
+      to: new Date(),
     }
+  } = {}) {
+    this.url = url;
+
+    this.from = range.from;
+    this.to = range.to;
+    this.label = label;
+    this.link = link;
+    this.formatHeading = formatHeading;
+
+    this.render();
+    this.requestData(this.from, this.to);
+  }
   
   render() {
     const element = document.createElement('div');
     
-    element.innerHTML = `<div class="column-chart" style="--chart-height: ${this.chartHeight}">
+    element.innerHTML = `<div class="column-chart">
       <div class="column-chart__title">
         Total ${this.label}
         <a href="${this.link}" class="column-chart__link">View all</a>
@@ -45,28 +46,29 @@ export default class ColumnChart {
     this.subElements = this.getSubElements(this.element);
   }
 
-  requestData() {        
+  async requestData(from, to) {        
     this.element.classList.add('column-chart_loading');
-    this.subElements.header.innerHTML = '';
+    this.subElements.header.textContent = '';
     this.subElements.body.innerHTML = '';
 
-    const promise = new Promise((resolve) => {
-      const newUrl = new URL(`https://course-js.javascript.ru/${this.url}`);
-        newUrl.searchParams.set('from', this.from.toISOString());
-        newUrl.searchParams.set('to', this.to.toISOString());
-        return resolve(newUrl);
-    });
+    const newUrl = new URL(this.url, `https://course-js.javascript.ru/`);
+    newUrl.searchParams.set('from', from.toISOString());
+    newUrl.searchParams.set('to', to.toISOString());
 
-    promise
-      .then(data => fetchJson(data))
-      .then(result => {
-        if (Object.values(result).length) {
-          this.subElements.header.innerHTML = this.formatHeading([...Object.values(Object.values(result))].reduce((a, b) => (a + b), 0));
-          this.subElements.body.innerHTML = this.getColumnProps(Object.values(result));
+    try {
+      const response = await fetchJson(newUrl);
+
+      const data = Object.values(response);
+
+      if (data.length) {
+        this.subElements.header.textContent = this.formatHeading([...Object.values(data)].reduce((a, b) => (a + b), 0));
+        this.subElements.body.innerHTML = this.getColumnProps(data);
       
-          this.element.classList.remove('column-chart_loading');
-        }
-      });
+        this.element.classList.remove('column-chart_loading');
+      }
+    } catch (error) {
+      console.error('Ошибка:', error);
+    }
   }
 
   getColumnProps(data) {
@@ -80,28 +82,8 @@ export default class ColumnChart {
       }).join('');
     }
   
-update(from, to) {
-    this.element.classList.add('column-chart_loading');
-    this.subElements.header.innerHTML = '';
-    this.subElements.body.innerHTML = '';
-
-    const promise = new Promise((resolve) => {
-      const newUrl = new URL(`https://course-js.javascript.ru/${this.url}`);
-        newUrl.searchParams.set('from', from.toISOString());
-        newUrl.searchParams.set('to', to.toISOString());
-        return resolve(newUrl);
-    });
-
-    promise
-      .then(data => fetchJson(data))
-      .then(result => {
-        if (Object.values(result).length) {
-          this.subElements.header.innerHTML = this.formatHeading([...Object.values(Object.values(result))].reduce((a, b) => (a + b), 0));;
-          this.subElements.body.innerHTML = this.getColumnProps(Object.values(result));
-      
-          this.element.classList.remove('column-chart_loading');
-        }
-      });
+async update(from, to) {
+    return await this.requestData(from, to);
 }
 
   getSubElements(element) {
