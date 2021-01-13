@@ -67,7 +67,7 @@ export default class ColumnChart {
         this.element.classList.remove('column-chart_loading');
       }
     } catch (error) {
-      return error;
+      //some error
     }
   }
 
